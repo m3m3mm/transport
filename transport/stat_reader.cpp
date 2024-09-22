@@ -22,6 +22,21 @@ void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::strin
                    << bus_info.unique_stops_count << " unique stops, "
                    << std::setprecision(6) << bus_info.route_length << " route length" << std::endl;
         }
+    } else if (command == "Stop") {
+        if (!transport_catalogue.HasStop(std::string(name))) {
+            output << "Stop " << name << ": not found" << std::endl;
+        } else {
+            const auto& buses = transport_catalogue.GetBusesForStop(std::string(name));
+            if (buses.empty()) {
+                output << "Stop " << name << ": no buses" << std::endl;
+            } else {
+                output << "Stop " << name << ": buses";
+                for (const auto& bus : buses) {
+                    output << " " << bus;
+                }
+                output << std::endl;
+            }
+        }
     } else {
         output << "Unknown command: " << command << std::endl;
     }

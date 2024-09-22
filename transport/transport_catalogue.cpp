@@ -23,7 +23,7 @@ void TransportCatalogue::AddBus(const std::string& name, const std::vector<std::
             stopname_to_stop_[stop->name] = stop;
         }
         bus_ptr->stops.push_back(stop);
-        stops_to_buses_[stop].insert(bus_ptr);
+        stop_to_buses_[stop->name].insert(bus_ptr->name);
     }
 }
 
@@ -67,4 +67,15 @@ TransportCatalogue::BusInfo TransportCatalogue::GetBusInfo(const std::string& na
     }
 
     return {stops_count, unique_stops_count, route_length};
+}
+
+std::set<std::string_view> TransportCatalogue::GetBusesForStop(const std::string& stop_name) const {
+    if (auto it = stop_to_buses_.find(stop_name); it != stop_to_buses_.end()) {
+        return it->second;
+    }
+    return {};
+}
+
+bool TransportCatalogue::HasStop(const std::string& name) const {
+    return stopname_to_stop_.count(name) > 0;
 }

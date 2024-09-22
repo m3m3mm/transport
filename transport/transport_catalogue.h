@@ -34,6 +34,8 @@ public:
     };
     
     BusInfo GetBusInfo(const std::string& name) const;
+    std::set<std::string_view> GetBusesForStop(const std::string& stop_name) const;
+        bool HasStop(const std::string& name) const;
 
 private:
     std::deque<Stop> stops_;
@@ -41,4 +43,5 @@ private:
     std::unordered_map<std::string_view, const Stop*> stopname_to_stop_;
     std::unordered_map<std::string_view, const Bus*> busname_to_bus_;
     std::unordered_map<const Stop*, std::set<const Bus*>> stops_to_buses_;
+    std::unordered_map<std::string_view, std::set<std::string_view>> stop_to_buses_;
 };
