@@ -41,5 +41,4 @@ private:
     std::unordered_map<std::string_view, const Stop*> stopname_to_stop_;
     std::unordered_map<std::string_view, const Bus*> busname_to_bus_;
     std::unordered_map<std::string_view, std::set<std::string_view>> stop_to_buses_;
-    std::unordered_map<std::string, double> distances_;
 };
