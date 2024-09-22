@@ -21,7 +21,7 @@ struct CommandDescription {
 };
 
 Coordinates ParseCoordinates(std::string_view str);
-std::vector<std::string_view> ParseRoute(std::string_view route);
+std::vector<std::string> ParseRoute(std::string_view route);
 
 class InputReader {
 public:

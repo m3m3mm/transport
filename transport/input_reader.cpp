@@ -16,24 +16,22 @@ Coordinates ParseCoordinates(std::string_view str) {
     return {lat, lng};
 }
 
-std::vector<std::string_view> ParseRoute(std::string_view route) {
-    std::vector<std::string_view> stops;
+std::vector<std::string> ParseRoute(std::string_view route) {
+    std::vector<std::string> stops;
     size_t pos = 0;
     while (pos < route.length()) {
         size_t next = route.find_first_of(">-", pos);
         if (next == std::string_view::npos) {
             next = route.length();
         }
-        // Удаление начальных и конечных пробелов в названии
         std::string_view stop = route.substr(pos, next - pos);
         stop.remove_prefix(std::min(stop.find_first_not_of(' '), stop.size()));
         stop.remove_suffix(stop.size() - stop.find_last_not_of(' ') - 1);
-        stops.push_back(stop);
+        stops.push_back(std::string(stop));
         pos = next + 1;
     }
     return stops;
 }
-
 
 void InputReader::ParseLine(std::string_view line) {
     size_t colon = line.find(':');
@@ -50,7 +48,7 @@ void InputReader::ParseLine(std::string_view line) {
     commands_.push_back({
         std::string(command_part.substr(0, space)),
         std::string(command_part.substr(space + 1)),
-        std::string(line.substr(colon + 1))
+        std::string(line.substr(colon + 2))
     });
 }
 

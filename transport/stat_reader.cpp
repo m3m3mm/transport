@@ -6,6 +6,7 @@ void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::strin
                        std::ostream& output) {
     auto space_pos = request.find(' ');
     if (space_pos == request.npos) {
+        output << "Invalid request format" << std::endl;
         return;
     }
 
@@ -13,14 +14,15 @@ void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::strin
     std::string_view name = request.substr(space_pos + 1);
 
     if (command == "Bus") {
-        const auto* bus = transport_catalogue.FindBus(std::string(name));
-        if (!bus) {
+        const auto bus_info = transport_catalogue.GetBusInfo(std::string(name));
+        if (bus_info.stops_count == 0) {
             output << "Bus " << name << ": not found" << std::endl;
         } else {
-            const auto bus_info = transport_catalogue.GetBusInfo(std::string(name));
             output << "Bus " << name << ": " << bus_info.stops_count << " stops on route, "
                    << bus_info.unique_stops_count << " unique stops, "
                    << std::setprecision(6) << bus_info.route_length << " route length" << std::endl;
         }
+    } else {
+        output << "Unknown command: " << command << std::endl;
     }
 }

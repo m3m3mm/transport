@@ -11,13 +11,19 @@ void TransportCatalogue::AddStop(const std::string& name, double latitude, doubl
 }
 
 void TransportCatalogue::AddBus(const std::string& name, const std::vector<std::string>& stop_names, bool is_roundtrip) {
-    buses_.push_back({name, stop_names, is_roundtrip});
-    const Bus* bus_ptr = &buses_.back();
+    buses_.push_back({name, {}, is_roundtrip});
+    Bus* bus_ptr = &buses_.back();
     busname_to_bus_[bus_ptr->name] = bus_ptr;
 
-    // Добавляем остановки в список маршрута автобуса
-    for (const auto& stop_name : bus_ptr->stop_names) {
-        stop_to_buses_[stop_name].insert(name);
+    for (const auto& stop_name : stop_names) {
+        const Stop* stop = FindStop(stop_name);
+        if (!stop) {
+            stops_.push_back({stop_name, {0, 0}});
+            stop = &stops_.back();
+            stopname_to_stop_[stop->name] = stop;
+        }
+        bus_ptr->stops.push_back(stop);
+        stops_to_buses_[stop].insert(bus_ptr);
     }
 }
 
@@ -44,34 +50,19 @@ TransportCatalogue::BusInfo TransportCatalogue::GetBusInfo(const std::string& na
         return {0, 0, 0.0};
     }
     
-    // Подсчёт количества остановок
-    int stops_count = bus->stop_names.size();
+    int stops_count = bus->is_roundtrip ? bus->stops.size() : bus->stops.size() * 2 - 1;
     
-    // Подсчёт уникальных остановок
-    std::unordered_set<std::string_view> unique_stops;
-    for (const auto& stop_name : bus->stop_names) {
-        unique_stops.insert(stop_name);
-    }
+    std::unordered_set<const Stop*> unique_stops(bus->stops.begin(), bus->stops.end());
     int unique_stops_count = unique_stops.size();
 
-    // Вычисление длины маршрута
     double route_length = 0.0;
-    for (size_t i = 1; i < bus->stop_names.size(); ++i) {
-        const Stop* stop1 = FindStop(bus->stop_names[i - 1]);
-        const Stop* stop2 = FindStop(bus->stop_names[i]);
-        if (stop1 && stop2) {
-            route_length += ComputeDistance(stop1->coordinates, stop2->coordinates);
-        }
+    for (size_t i = 1; i < bus->stops.size(); ++i) {
+        route_length += ComputeDistance(bus->stops[i-1]->coordinates, bus->stops[i]->coordinates);
     }
-
-    // Обработка обратного маршрута для не кольцевых маршрутов
-    if (!bus->is_roundtrip) {
-        for (size_t i = bus->stop_names.size(); i > 1; --i) {
-            const Stop* stop1 = FindStop(bus->stop_names[i - 1]);
-            const Stop* stop2 = FindStop(bus->stop_names[i - 2]);
-            if (stop1 && stop2) {
-                route_length += ComputeDistance(stop1->coordinates, stop2->coordinates);
-            }
+    
+    if (!bus->is_roundtrip && bus->stops.size() > 1) {
+        for (size_t i = bus->stops.size() - 1; i > 0; --i) {
+            route_length += ComputeDistance(bus->stops[i]->coordinates, bus->stops[i-1]->coordinates);
         }
     }
 
