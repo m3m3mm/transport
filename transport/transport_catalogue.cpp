@@ -1,8 +1,9 @@
-// transport_catalogue.cpp
 #include "transport_catalogue.h"
 #include <algorithm>
 #include <stdexcept>
 #include <unordered_set>
+
+namespace transport_catalogue {
 
 void TransportCatalogue::AddStop(const std::string& name, double latitude, double longitude) {
     stops_.emplace_back(Stop{name, {latitude, longitude}});
@@ -34,15 +35,12 @@ const Bus* TransportCatalogue::FindBus(const std::string& name) const {
     return nullptr;
 }
 
-
 const Stop* TransportCatalogue::FindStop(const std::string& name) const {
     if (auto it = stopname_to_stop_.find(name); it != stopname_to_stop_.end()) {
         return it->second;
     }
     return nullptr;
 }
-
-
 
 TransportCatalogue::BusInfo TransportCatalogue::GetBusInfo(const std::string& name) const {
     const Bus* bus = FindBus(name);
@@ -57,12 +55,12 @@ TransportCatalogue::BusInfo TransportCatalogue::GetBusInfo(const std::string& na
 
     double route_length = 0.0;
     for (size_t i = 1; i < bus->stops.size(); ++i) {
-        route_length += ComputeDistance(bus->stops[i-1]->coordinates, bus->stops[i]->coordinates);
+        route_length += geo::ComputeDistance(bus->stops[i-1]->coordinates, bus->stops[i]->coordinates);
     }
     
     if (!bus->is_roundtrip && bus->stops.size() > 1) {
         for (size_t i = bus->stops.size() - 1; i > 0; --i) {
-            route_length += ComputeDistance(bus->stops[i]->coordinates, bus->stops[i-1]->coordinates);
+            route_length += geo::ComputeDistance(bus->stops[i]->coordinates, bus->stops[i-1]->coordinates);
         }
     }
 
@@ -79,3 +77,5 @@ std::set<std::string_view> TransportCatalogue::GetBusesForStop(const std::string
 bool TransportCatalogue::HasStop(const std::string& name) const {
     return stopname_to_stop_.count(name) > 0;
 }
+
+} // namespace transport_catalogue

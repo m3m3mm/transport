@@ -4,7 +4,11 @@
 #include <cassert>
 #include <iterator>
 
-Coordinates ParseCoordinates(std::string_view str) {
+namespace transport_catalogue {
+namespace input {
+namespace detail {
+
+geo::Coordinates ParseCoordinates(std::string_view str) {
     size_t comma = str.find(',');
     if (comma == str.npos) {
         return {0, 0};
@@ -33,6 +37,8 @@ std::vector<std::string> ParseRoute(std::string_view route) {
     return stops;
 }
 
+} // namespace detail
+
 void InputReader::ParseLine(std::string_view line) {
     size_t colon = line.find(':');
     if (colon == line.npos) {
@@ -55,16 +61,19 @@ void InputReader::ParseLine(std::string_view line) {
 void InputReader::ApplyCommands(TransportCatalogue& catalogue) const {
     for (const auto& command : commands_) {
         if (command.command == "Stop") {
-            auto [lat, lng] = ParseCoordinates(command.description);
+            auto [lat, lng] = detail::ParseCoordinates(command.description);
             catalogue.AddStop(command.id, lat, lng);
         }
     }
 
     for (const auto& command : commands_) {
         if (command.command == "Bus") {
-            auto stops = ParseRoute(command.description);
+            auto stops = detail::ParseRoute(command.description);
             bool is_roundtrip = command.description.find('>') != std::string::npos;
             catalogue.AddBus(command.id, {stops.begin(), stops.end()}, is_roundtrip);
         }
     }
 }
+
+} // namespace input
+} // namespace transport_catalogue

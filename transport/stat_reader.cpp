@@ -2,6 +2,9 @@
 #include <iostream>
 #include <iomanip>
 
+namespace transport_catalogue {
+namespace output {
+
 void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::string_view request,
                        std::ostream& output) {
     auto space_pos = request.find(' ');
@@ -41,3 +44,6 @@ void ParseAndPrintStat(const TransportCatalogue& transport_catalogue, std::strin
         output << "Unknown command: " << command << std::endl;
     }
 }
+
+} // namespace output
+} // namespace transport_catalogue

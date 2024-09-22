@@ -6,6 +6,9 @@
 #include "geo.h"
 #include "transport_catalogue.h"
 
+namespace transport_catalogue {
+namespace input {
+
 struct CommandDescription {
     explicit operator bool() const {
         return !command.empty();
@@ -20,8 +23,10 @@ struct CommandDescription {
     std::string description;
 };
 
-Coordinates ParseCoordinates(std::string_view str);
+namespace detail {
+geo::Coordinates ParseCoordinates(std::string_view str);
 std::vector<std::string> ParseRoute(std::string_view route);
+} // namespace detail
 
 class InputReader {
 public:
@@ -31,3 +36,6 @@ public:
 private:
     std::vector<CommandDescription> commands_;
 };
+
+} // namespace input
+} // namespace transport_catalogue
