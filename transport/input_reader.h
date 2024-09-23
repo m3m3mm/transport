@@ -23,10 +23,10 @@ struct CommandDescription {
     std::string description;
 };
 
-namespace detail {
+
 geo::Coordinates ParseCoordinates(std::string_view str);
 std::vector<std::string> ParseRoute(std::string_view route);
-} // namespace detail
+
 
 class InputReader {
 public:
