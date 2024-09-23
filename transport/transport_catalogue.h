@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <set>
 #include <deque>
+#include <optional> // Необходимо для использования std::optional
 #include "geo.h"
 
 namespace transport_catalogue {
@@ -22,7 +23,7 @@ struct Bus {
 
 class TransportCatalogue {
 public:
-    void AddStop(const std::string& name, double latitude, double longitude);
+    void AddStop(std::string_view name, geo::Coordinates coordinates);
     void AddBus(const std::string& name, const std::vector<std::string>& stop_names, bool is_roundtrip);
     double CalculateRouteLength(const Bus& bus) const;
     const Bus* FindBus(const std::string& name) const;
@@ -34,8 +35,9 @@ public:
         int unique_stops_count;
         double route_length;
     };
-    
-    BusInfo GetBusInfo(const std::string& name) const;
+
+    // Изменяем тип возврата на std::optional<BusInfo>
+    std::optional<BusInfo> GetBusInfo(const std::string& name) const;
     std::set<std::string_view> GetBusesForStop(const std::string& stop_name) const;
     bool HasStop(const std::string& name) const;
 
@@ -44,7 +46,6 @@ private:
     std::deque<Bus> buses_;
     std::unordered_map<std::string_view, const Stop*> stopname_to_stop_;
     std::unordered_map<std::string_view, const Bus*> busname_to_bus_;
-    std::unordered_map<const Stop*, std::set<const Bus*>> stops_to_buses_;
     std::unordered_map<std::string_view, std::set<std::string_view>> stop_to_buses_;
 };
 
